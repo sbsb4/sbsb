@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>送出資料到 Ragic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Microsoft JhengHei', sans-serif;
+      background-color: #f0f0f0;
+      padding: 2rem;
+      text-align: center;
+    }
+    input, select, button {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>停車系統</h1>
+  <div>
+    <input type="text" id="name" placeholder="請輸入帳號，如：陳小姐" />
+    <input type="text" id="status" placeholder="請輸入狀態，如：停車" />
+    <select id="level">
+      <option value="">請選擇訂閱等級</option>
+      <option value="低">低</option>
+      <option value="中">中</option>
+      <option value="高級">高級</option>
+      <option value="special">special</option>
+      <option value="其他">其他</option>
+    </select>
+    <button onclick="sendPost()">送出</button>
+  </div>
+
+  <div id="result">請輸入帳號、狀態與等級</div>
+
+  <script>
+    function sendPost() {
+      const name = document.getElementById("name").value.trim();
+      const status = document.getElementById("status").value.trim();
+      const level = document.getElementById("level").value;
+
+      if (!name || !status || !level) {
+        document.getElementById("result").textContent = "⚠️ 請輸入完整資料（帳號、狀態、等級）。";
+        return;
+      }
+
+      const url = "https://ap12.ragic.com/89793238/nfc3/4?api";
+      const apiKey = "UGQ4cGFmNjg2R0J2TXNSMXpZdVVvRTdvU1ArWHBHeEVEUjFIT2p4aFpZZEt3eUd6RnZTV0dlN0VBMFBkT0hJUw==";
+
+      const formData = new URLSearchParams();
+      formData.append("APIKey", apiKey);
+      formData.append("1000106", name);   // 帳號欄位
+      formData.append("1000107", status); // 狀態欄位
+      formData.append("1000110", level);  // 訂閱等級欄位
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("result").textContent = "✅ 已送出 POST 請求：\n" + data;
+      })
+      .catch(error => {
+        document.getElementById("result").textContent = "❌ 發送失敗：\n" + error;
+      });
+    }
+  </script>
+</body>
+</html>
